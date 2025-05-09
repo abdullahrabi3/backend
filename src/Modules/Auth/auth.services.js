@@ -9,7 +9,7 @@ export const register = async (req, res, next) => {
 
   const checkUser = await Usermodel.findOne({ email });
   if (checkUser) {
-    return res.status(409).json({ message: "user found" });
+    return res.status(409).json({ success: false, message: "user found" });
   }
   const hashedPassword = bcrypt.hashSync(password, 10);
   const encryptedphone = CryptoJS.AES.encrypt(
@@ -22,7 +22,9 @@ export const register = async (req, res, next) => {
     password: hashedPassword,
     phone: encryptedphone,
   });
-  return res.status(201).json({ message: "user created successfully", user });
+  return res
+    .status(201)
+    .json({ success: true, message: "user created successfully", user });
 };
 
 export const login = async (req, res, next) => {
@@ -45,9 +47,11 @@ export const login = async (req, res, next) => {
   );
 
   if (user.isDlete == true) {
-    user.isDlete = false; //acctive account
+    user.isDlete = false;
     await user.save();
   }
 
-  return res.status(200).json({ key: success, date: token });
+  return res
+    .status(200)
+    .json({ success: true, message: "login successfully", token });
 };

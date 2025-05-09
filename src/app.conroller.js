@@ -22,7 +22,7 @@ const bootstrap = async (app, express) => {
     const status = error.cause || 500;
     return res
       .status(status)
-      .json({ key: success, massage: error.massage, stack: error.stack });
+      .json({ success: false, massage: error.massage, stack: error.stack });
   });
 };
 
