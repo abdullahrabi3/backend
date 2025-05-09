@@ -9,7 +9,7 @@ export const register = async (req, res, next) => {
 
   const checkUser = await Usermodel.findOne({ email });
   if (checkUser) {
-    return res.status(409).json({ success: false, message: "user found" });
+    return res.status(409).json({ success: true, message: "user  found" });
   }
   const hashedPassword = bcrypt.hashSync(password, 10);
   const encryptedphone = CryptoJS.AES.encrypt(
