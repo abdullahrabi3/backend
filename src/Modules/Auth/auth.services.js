@@ -5,11 +5,16 @@ import jwt from "jsonwebtoken";
 import { rolesTypes } from "../../middlewares/auth.middleware.js";
 
 export const register = async (req, res, next) => {
-  const { email, password, phone } = req.body;
+  const { email, password, phone,gender,age } = req.body;
 
   const checkUser = await Usermodel.findOne({ email });
   if (checkUser) {
-    return res.status(409).json({ success: true, message: "user  found" });
+    return res.status(409).json({
+      key: "success",
+      success: false,
+      data: null,
+      message: "user found"
+    });
   }
   const hashedPassword = bcrypt.hashSync(password, 10);
   const encryptedphone = CryptoJS.AES.encrypt(
@@ -22,22 +27,44 @@ export const register = async (req, res, next) => {
     password: hashedPassword,
     phone: encryptedphone,
   });
-  return res
-    .status(201)
-    .json({ success: true, message: "user created successfully", user });
+  return res.status(201).json({
+    key: "success",
+    success: true,
+    data: { user },
+  });
 };
 
 export const login = async (req, res, next) => {
   const { email } = req.body;
 
   const user = await Usermodel.findOne({ email });
-  if (!user) return next(new Error("user not found", { cause: 404 }));
+  if (!user) {
+    return res.status(404).json({
+      key: "success",
+      success: false,
+      data: null,
+      message: "user not found"
+    });
+  }
 
-  if (!user.confirmEmail === false)
-    return next(new Error("user not confirmed", { cause: 400 }));
+  if (!user.confirmEmail === false) {
+    return res.status(400).json({
+      key: "success",
+      success: false,
+      data: null,
+      message: "user not confirmed"
+    });
+  }
 
   const match = bcrypt.compareSync(req.body.password, user.password);
-  if (!match) return next(new Error("invalid password", { cause: 400 }));
+  if (!match) {
+    return res.status(400).json({
+      key: "success",
+      success: false,
+      data: null,
+      message: "invalid password"
+    });
+  }
   const token = jwt.sign(
     { id: user._id, isloggedIn: true },
     user.role === rolesTypes.User
@@ -51,7 +78,9 @@ export const login = async (req, res, next) => {
     await user.save();
   }
 
-  return res
-    .status(200)
-    .json({ success: true, message: "login successfully", token });
+  return res.status(200).json({
+    key: "success",
+    success: true,
+    data: { token },
+  });
 };

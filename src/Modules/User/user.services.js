@@ -9,7 +9,11 @@ export const getptofile = asyncHandler(async (req, res, next) => {
     encrpted: user.phone,
     sign: process.env.ENCRIPTION_SECRIT,
   });
-  return res.status(200).json({ success: true, message: "user profile", user });
+  return res.status(200).json({
+    key: "success",
+    success: true,
+    data: { user },
+  });
 });
 
 export const editprofile = asyncHandler(async (req, res, next) => {
@@ -25,10 +29,10 @@ export const editprofile = asyncHandler(async (req, res, next) => {
     { ...req.body },
     { new: true, runValidators: true }
   );
-  return req.status(200).json({
+  return res.status(200).json({
+    key: "success",
     success: true,
-    message: "user updated",
-    result: { user: editUser },
+    data: { user: editUser },
   });
 });
 
@@ -39,7 +43,14 @@ export const changepassword = asyncHandler(async (req, res, next) => {
     hash: req.user.password,
   });
 
-  if (!compareHash) return next(new Error("invalid password", { cause: 400 }));
+  if (!compareHash) {
+    return res.status(400).json({
+      key: "success",
+      success: false,
+      data: null,
+      message: "invalid password"
+    });
+  }
   const hashedPassword = hash({ plainTixt: newPassword });
   const editUser = await UserModel.findOneAndUpdate(
     req.user._id,
@@ -47,10 +58,10 @@ export const changepassword = asyncHandler(async (req, res, next) => {
     { new: true, runValidators: true }
   );
 
-  return req.status(200).json({
+  return res.status(200).json({
+    key: "success",
     success: true,
-    message: "password updated successfully",
-    result: { user: editUser },
+    data: { user: editUser },
   });
 });
 
@@ -66,10 +77,9 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
       runValidators: true,
     }
   );
-  return req.status(200).json({
-    key: success,
-    message: "user deleted successfully",
-
-    result: { user },
+  return res.status(200).json({
+    key: "success",
+    success: true,
+    data: { user },
   });
 });

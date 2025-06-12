@@ -2,6 +2,7 @@ import connectDB from "./DB/conection.js";
 import authRouter from "./Modules/Auth/auth.controller.js";
 import massegeRouter from "./Modules/Masseges/massege.controller.js";
 import userRouter from "./Modules/User/user.controller.js";
+import subscriptionRouter from "./Modules/Subscription/subscription.controller.js";
 import cors from "cors";
 import bcrypt from "bcrypt";
 import Usermodel from "./DB/models/user.models.js";
@@ -13,6 +14,8 @@ const bootstrap = async (app, express) => {
   app.use("/auth", authRouter);
   app.use("/massege", massegeRouter);
   app.use("/user", userRouter);
+  app.use("/subscriptions", subscriptionRouter);
+  app.use("/admin", creatAdmin);
 
   async function creatAdmin() {
     const adminExists = await Usermodel.findOne({ role: "admin" });
